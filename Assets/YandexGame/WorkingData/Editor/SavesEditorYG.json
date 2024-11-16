@@ -1,9 +1,8 @@
 {
-    "idSave": 95,
+    "idSave": 118,
     "isFirstSession": false,
     "language": "ru",
     "promptDone": false,
-    "CurrentLevel": 1,
-    "MusicEnabled": true,
-    "SfxEnabled": true
+    "CurrentLevel": 2,
+    "SoundEnabled": true
 }
