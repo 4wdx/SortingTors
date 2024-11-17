@@ -34,49 +34,47 @@ namespace CodeBase.Root.Services
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            
+
             return generatedMap;
         }
 
-        private void GenerateByString(ref PinData[] map, int pinsCount, ref List<int> colors)
+        private void GenerateByString(ref PinData[] pins, int pinsCount, ref List<int> colors)
         {
             for (int i = 0; i < pinsCount; i++)
-                map[i].Initialize(Const.TorsInPin);
+                pins[i].Initialize(Const.TorsInPin);
 
-            int iterations = 0;
-            while (true)
+
+            for (int j = 0; j < Const.TorsInPin; j++)
             {
                 for (int i = 0; i < pinsCount; i++)
                 {
-                    int randomColor;
+                    int randomColor = 0;
                     if (colors.Count > 0)
+                    {
                         randomColor = colors[Random.Range(0, colors.Count)];
-                    else
-                        return;
+                        colors.Remove(randomColor);
+                    }
                     
-                    map[i].TorsColors[iterations] = randomColor;
-                    //Debug.Log(randomColor);
-                    colors.Remove(randomColor);
+                    pins[i].TorsColors[j] = randomColor;
                 }
-                iterations++;
             }
         }
 
-        private void GenerateFillPin(ref PinData[] map, int pinsCount, ref List<int> colors)
+        private void GenerateFillPin(ref PinData[] pins, int pinsCount, ref List<int> colors)
         {
             if (pinsCount == 2)
             {
-                GenerateByString(ref map, pinsCount, ref colors);
+                GenerateByString(ref pins, pinsCount, ref colors);
                 return;
             }
             
             for (int i = 0; i < pinsCount; i++)
-                map[i].Initialize(Const.TorsInPin);
+                pins[i].Initialize(Const.TorsInPin);
 
             for (int i = 0; i < pinsCount; i++)
             {
                 int identityColors = 1;
-                for (int j = 0; j < map[i].TorsColors.Length; j++)
+                for (int j = 0; j < pins[i].TorsColors.Length; j++)
                 {
                     int randomColor;
                     if (colors.Count > 0)
@@ -86,28 +84,28 @@ namespace CodeBase.Root.Services
 
                     if (j > 0) //check identity colors
                     {
-                        if (map[i].TorsColors[j - 1] == randomColor)
+                        if (pins[i].TorsColors[j - 1] == randomColor)
                             identityColors++;
 
-                        if (identityColors == map[i].TorsColors.Length)
+                        if (identityColors == pins[i].TorsColors.Length)
                         {
                             if (colors.Count > 0)
                             {
-                                while (randomColor == map[i].TorsColors[j - 1])
+                                while (randomColor == pins[i].TorsColors[j - 1])
                                 {
                                     randomColor = colors[Random.Range(0, colors.Count)];
                                 }
                             }
                             else
                             {
-                                map[pinsCount].Initialize(Const.TorsInPin);
-                                map[pinsCount].TorsColors[0] = colors[0];
+                                pins[pinsCount].Initialize(Const.TorsInPin);
+                                pins[pinsCount].TorsColors[0] = colors[0];
                                 colors.RemoveAt(0);
                             }
                         }
                     }
                     
-                    map[i].TorsColors[j] = randomColor;
+                    pins[i].TorsColors[j] = randomColor;
                     //Debug.Log(randomColor);
                     colors.Remove(randomColor);
                 }

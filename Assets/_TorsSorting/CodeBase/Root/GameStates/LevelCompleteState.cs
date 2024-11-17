@@ -2,6 +2,7 @@
 using CodeBase.Game.UI;
 using CodeBase.Root.Services;
 using UnityEngine;
+using YG;
 
 namespace CodeBase.Root
 {
@@ -9,18 +10,15 @@ namespace CodeBase.Root
     {
         private readonly ISaveService _saveService;
         private readonly NextLevelButton _nextLevelButton;
-        private readonly ParticleSystem[] _particleSystems;
         private readonly AudioSource _winSound;
 
         public LevelCompleteState(StateMachine<GameState> stateMachine,
             ISaveService saveService,
             NextLevelButton nextLevelButton,
-            ParticleSystem[] particleSystems,
             AudioSource winSound) : base(stateMachine)
         {
             _saveService = saveService;
             _nextLevelButton = nextLevelButton;
-            _particleSystems = particleSystems;
             _winSound = winSound;
         }
 
@@ -29,9 +27,6 @@ namespace CodeBase.Root
             _saveService.LevelComplete();
             _nextLevelButton.OnClick += GoTo;
             _nextLevelButton.Show();
-            
-            foreach (ParticleSystem particleSystem in _particleSystems) 
-                particleSystem.Play();
             
             _winSound.Play();
         }
@@ -42,7 +37,10 @@ namespace CodeBase.Root
             _nextLevelButton.OnClick -= GoTo;
         }
 
-        private void GoTo() => 
+        private void GoTo()
+        {
+            YandexGame.FullscreenShow();
             StateMachine.GoTo<GameplayState, int>(_saveService.GetCurrentLevel());
+        }
     }
 }

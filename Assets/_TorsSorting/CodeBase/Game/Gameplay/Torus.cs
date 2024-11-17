@@ -41,11 +41,11 @@ namespace CodeBase.Game.Gameplay
             StartCoroutine(StopDragAnim(stopPosition));
         }
 
-        public void StopDrag()
+        /*public void StopDrag()
         {
             StopAllCoroutines();
             StartCoroutine(StopDragAnim(_startPosition));
-        }
+        }*/
 
         private IEnumerator StartDragAnim(Transform followingPoint)
         {

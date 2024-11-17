@@ -1,4 +1,6 @@
-﻿using CodeBase.Configs;
+﻿using System.Collections;
+using System.Collections.Generic;
+using CodeBase.Configs;
 using CodeBase.FSM;
 using CodeBase.Game.Gameplay;
 using CodeBase.Game.UI;
@@ -35,11 +37,13 @@ namespace CodeBase.Root
             _levelText.SetLevel(loadingLevel);
             _dragHandler.Enabled = true;
             
-            int difficulty = _levelsConfig.GetDifficulty(loadingLevel); 
+            /*int difficulty = _levelsConfig.GetDifficulty(loadingLevel); 
             Debug.Log(difficulty);
             PinData[] levelData = _generationService.Generate(difficulty);
             
-            _pinsHandler.Initialize(levelData);
+            _pinsHandler.Initialize(levelData);*/
+
+            _pinsHandler.StartCoroutine(LoadLevel(loadingLevel));
             _pinsHandler.OnComplete += GoTo;
         }
         
@@ -51,5 +55,21 @@ namespace CodeBase.Root
 
         private void GoTo() => 
             StateMachine.GoTo<LevelCompleteState>();
+
+        private IEnumerator LoadLevel(int loadingLevel)
+        {
+            int difficulty = _levelsConfig.GetDifficulty(loadingLevel); 
+            Debug.Log(difficulty);
+            PinData[] levelData = _generationService.Generate(difficulty);
+            
+            yield return null;
+            yield return null;
+            yield return null;
+            yield return null;
+            yield return null;
+            
+            _pinsHandler.Initialize(levelData);
+            
+        }
     }
 }

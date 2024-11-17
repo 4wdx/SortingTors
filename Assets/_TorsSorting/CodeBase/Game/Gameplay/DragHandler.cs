@@ -10,6 +10,7 @@ namespace CodeBase.Game.Gameplay
         private readonly Transform _mouseWorldPosition;
         private Torus _dragableTorus;
         private Pin _cachedPin;
+        private Vector3 _startPos;
 
         private readonly LayerMask _pinsLayer;
         private readonly LayerMask _planeLayer;
@@ -39,9 +40,11 @@ namespace CodeBase.Game.Gameplay
             if (hit.transform.TryGetComponent(out _cachedPin) == false)
                 return;
             
-            if (_cachedPin.TryGetUpperDragable(out _dragableTorus))
+            _dragableTorus = _cachedPin.GetUpperTorus();
+            if (_dragableTorus != null)
             {
                 _mouseWorldPosition.position = hit.point;
+                _startPos = _cachedPin.GetUpperPosition();
                 _dragableTorus.StartDrag(_mouseWorldPosition);
             }
         }
@@ -60,14 +63,31 @@ namespace CodeBase.Game.Gameplay
             {
                 if (hit.transform.TryGetComponent(out Pin pin))
                 {
-                    if (pin.TrySetDragable(_dragableTorus))
-                        return;
+                    if (pin.CanSet() && pin != _cachedPin)
+                    {
+                        _cachedPin.RemoveUpperTorus();
+                        pin.SetDragable(_dragableTorus);
+                    }
+                    else
+                    {
+                        _dragableTorus.StopDrag(_startPos);
+                        _dragableTorus = null;
+                        _cachedPin = null;
+                    }
+                }
+                else
+                {
+                    _dragableTorus.StopDrag(_startPos);
+                    _dragableTorus = null;
+                    _cachedPin = null;
                 }
             }
-            
-            _cachedPin.TrySetDragable(_dragableTorus);
-            _dragableTorus.StopDrag();
-            _dragableTorus = null;
+            else
+            {
+                _dragableTorus.StopDrag(_startPos);
+                _dragableTorus = null;
+                _cachedPin = null;
+            }
         }
 
         private bool Raycast(LayerMask layerMask, out RaycastHit hit)

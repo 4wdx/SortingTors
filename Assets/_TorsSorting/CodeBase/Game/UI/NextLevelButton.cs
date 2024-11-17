@@ -22,11 +22,17 @@ namespace CodeBase.Game.UI
             _image.gameObject.SetActive(false);
         }
 
-        public void Show() => 
+        public void Show()
+        {
+            _isActive = true;
             StartCoroutine(ShowAnim());
+        }
 
-        public void Hide() => 
+        public void Hide()
+        {
+            _isActive = false;
             StartCoroutine(HideAnim());
+        }
 
         public void _Click()
         {

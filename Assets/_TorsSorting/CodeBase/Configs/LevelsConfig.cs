@@ -14,8 +14,13 @@ namespace CodeBase.Configs
                 return 0;
             
             int rank = 0;
-            rank = (int)(levelIndex / _levelsInRank);
-            rank = Mathf.Clamp(rank, 1, 7);
+            while (rank * _levelsInRank <= levelIndex)
+            {
+                rank++;
+                if (rank >= 7)
+                    return 7;
+            }
+            
             return rank;
         }
     }

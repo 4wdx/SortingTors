@@ -23,7 +23,6 @@ namespace CodeBase.Root
         [SerializeField] private LevelText _levelText;
         
         [Space, Header("Effects")]
-        [SerializeField] private ParticleSystem[] _particleSystems;
         [SerializeField] private AudioSource _winSound;
         
         [Space, Header("Layers")]
@@ -50,7 +49,7 @@ namespace CodeBase.Root
             
             _stateMachine = new StateMachine<GameState>();
             _stateMachine.AddState(new GameplayState(_stateMachine, _pinsHandler, _generationService, _levelsConfig, _levelText, _dragHandler));
-            _stateMachine.AddState(new LevelCompleteState(_stateMachine, _saveService, _nextLevelButton, _particleSystems, _winSound));
+            _stateMachine.AddState(new LevelCompleteState(_stateMachine, _saveService, _nextLevelButton, _winSound));
         
             _stateMachine.GoTo<GameplayState, int>(_saveService.GetCurrentLevel());
         }

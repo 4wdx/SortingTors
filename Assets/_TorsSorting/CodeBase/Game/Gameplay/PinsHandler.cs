@@ -19,7 +19,7 @@ namespace CodeBase.Game.Gameplay
 
         public void Initialize(PinData[] pinsData)
         {
-            _completedCount = 1;
+            _completedCount = 0;
             
             for (int i = 0; i < _pins.Length; i++)
             {
@@ -44,8 +44,7 @@ namespace CodeBase.Game.Gameplay
             else 
                 _completedCount--;
             
-            print(_completedCount);
-            if (_completedCount == _pins.Length)
+            if (_completedCount == _pins.Length - 1)
                 OnComplete?.Invoke();
         }
 
