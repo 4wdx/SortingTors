@@ -18,7 +18,7 @@ namespace CodeBase.Utils
         {
             foreach (ITickable tickable in _tickables)
             {
-                tickable.Tick();
+                tickable.Tick(Time.deltaTime);
             }
         }
     }

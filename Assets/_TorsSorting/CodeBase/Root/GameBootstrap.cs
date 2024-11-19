@@ -1,10 +1,12 @@
 ﻿using CodeBase.Configs;
 using CodeBase.FSM;
 using CodeBase.Game.Gameplay;
+using CodeBase.Game.PlayerInput;
 using CodeBase.Game.UI;
 using CodeBase.Root.Services;
 using CodeBase.Utils;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace CodeBase.Root
 {
@@ -15,7 +17,8 @@ namespace CodeBase.Root
         
         [Space, Header("Gameplay components")]
         [SerializeField] private AudioListener _audioListener;
-        [SerializeField] private PinsHandler _pinsHandler;
+        [SerializeField] private PinsStack _pinsStack;
+        [SerializeField] private Mesh _torusMesh;
         
         [Space, Header("UI components")]
         [SerializeField] private NextLevelButton _nextLevelButton;
@@ -48,7 +51,7 @@ namespace CodeBase.Root
             InitComponents();
             
             _stateMachine = new StateMachine<GameState>();
-            _stateMachine.AddState(new GameplayState(_stateMachine, _pinsHandler, _generationService, _levelsConfig, _levelText, _dragHandler));
+            _stateMachine.AddState(new GameplayState(_stateMachine, _pinsStack, _generationService, _levelsConfig, _levelText, _dragHandler, _torusMesh));
             _stateMachine.AddState(new LevelCompleteState(_stateMachine, _saveService, _nextLevelButton, _winSound));
         
             _stateMachine.GoTo<GameplayState, int>(_saveService.GetCurrentLevel());

@@ -1,35 +1,37 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using CodeBase.Configs;
 using CodeBase.FSM;
 using CodeBase.Game.Gameplay;
+using CodeBase.Game.PlayerInput;
 using CodeBase.Game.UI;
 using CodeBase.Root.Services;
 using UnityEngine;
-using UnityEngine.Networking;
 
 namespace CodeBase.Root
 {
     public sealed class GameplayState : GameState, IParametredState<int>
     {
-        private readonly PinsHandler _pinsHandler;
+        private readonly PinsStack _pinsStack;
         private readonly IGenerationService _generationService;
         private readonly LevelsConfig _levelsConfig;
         private readonly LevelText _levelText;
         private readonly DragHandler _dragHandler;
+        private readonly Mesh _mesh;
 
         public GameplayState(StateMachine<GameState> stateMachine, 
-            PinsHandler pinsHandler,
+            PinsStack pinsStack,
             IGenerationService generationService,
             LevelsConfig levelsConfig,
             LevelText levelText,
-            DragHandler dragHandler) : base(stateMachine)
+            DragHandler dragHandler,
+            Mesh mesh) : base(stateMachine)
         {
-            _pinsHandler = pinsHandler;
+            _pinsStack = pinsStack;
             _generationService = generationService;
             _levelsConfig = levelsConfig;
             _levelText = levelText;
             _dragHandler = dragHandler;
+            _mesh = mesh;
         }
 
         public void Enter(int loadingLevel)
@@ -43,13 +45,14 @@ namespace CodeBase.Root
             
             _pinsHandler.Initialize(levelData);*/
 
-            _pinsHandler.StartCoroutine(LoadLevel(loadingLevel));
-            _pinsHandler.OnComplete += GoTo;
+            //_pinsStack.StartCoroutine(LoadLevel(loadingLevel));
+            _pinsStack.Initialize(_mesh);
+            _pinsStack.OnComplete += GoTo;
         }
         
         public override void Exit()
         {
-            _pinsHandler.OnComplete -= GoTo;
+            _pinsStack.OnComplete -= GoTo;
             _dragHandler.Enabled = false;
         }
 
@@ -68,7 +71,7 @@ namespace CodeBase.Root
             yield return null;
             yield return null;
             
-            _pinsHandler.Initialize(levelData);
+            //_pinsStack.Initialize(levelData);
             
         }
     }

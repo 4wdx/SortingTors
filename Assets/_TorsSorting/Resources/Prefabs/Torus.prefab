@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 8746463396319306889}
   - component: {fileID: 1201823327697641869}
   m_Layer: 0
-  m_Name: Thor
+  m_Name: Torus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -122,5 +122,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <Color>k__BackingField: 0
   _animTime: 0.25
-  _followSpeed: 10
+  _zxSpeed: 8
   _colorMap: {fileID: 11400000, guid: cde9167d8fa781a44bd22968dc4095fe, type: 2}

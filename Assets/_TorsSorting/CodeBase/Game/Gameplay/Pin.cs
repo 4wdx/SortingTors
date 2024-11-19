@@ -1,128 +1,99 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CodeBase.Root.Services;
-using CodeBase.Utils;
 using UnityEngine;
 
 namespace CodeBase.Game.Gameplay
 {
     public class Pin : MonoBehaviour
     {
-        public event Action<bool> OnFillStateChange;
+        public event Action OnCompleted;
         
         [SerializeField] private Torus[] _tors;
         
-        private Torus[] _dragableObjects;
-        private Vector3[] _startPositions;
-        private int _currentCount;
+        private Stack<Torus> _torusStack;
         private int _maxCount;
+        private bool _completed;
+        
+        private Vector3[] _startPositions;
+        private float _upPos;
 
         private void Awake()
         {
-            _maxCount = Const.TorsInPin;
-            _startPositions = new Vector3[_maxCount];
-            _dragableObjects = new Torus[_maxCount];
+            _maxCount = _tors.Length;
+            _torusStack = new Stack<Torus>();
 
+            _startPositions = new Vector3[_maxCount];
             for (int i = 0; i < _tors.Length; i++) 
                 _startPositions[i] = _tors[i].transform.position;
         }
 
-        public void Initialize(PinData pinData)
+        public void Initialize(Mesh torusMesh, float upPos)
         {
-            for (int i = 0; i < _dragableObjects.Length; i++) 
-                _dragableObjects[i] = null;
+            _torusStack.Clear();
+            _upPos = upPos;
             
-            _currentCount = 0;
-            for (int i = 0; i < pinData.TorsColors.Length; i++)
+            for (int i = 0; i < _tors.Length; i++)
             {
-                if (pinData.TorsColors[i] > 0)
+                if (_tors[i].Color > 0)
                 {
-                    _tors[i].gameObject.SetActive(true);
                     _tors[i].transform.position = _startPositions[i];
-                    _tors[i].Initialize(pinData.TorsColors[i]);
-                    
-                    Debug.Log("pin: " + gameObject.name + ", tor: " + _tors[i].name + ", color: " + pinData.TorsColors[i]);
-                    Add(_tors[i]);
+                    _tors[i].Initialize(torusMesh);
+                    _torusStack.Push(_tors[i]);
                 }
                 else 
                     _tors[i].gameObject.SetActive(false);
             }
         }
 
-        public void Hide()
+        public bool SetToUpper(Torus addedTorus)
         {
-            _currentCount = 0;
-            for (int i = 0; i < _dragableObjects.Length; i++) 
-                _dragableObjects[i] = null;
-            
-            foreach (Torus tor in _tors)
-                tor.gameObject.SetActive(false);
-        }
-
-        public Torus GetUpperTorus()
-        {
-            if (_currentCount == 0) 
-                return null;
-            
-            return GetUpper();
-        }
-
-        public Vector3 GetUpperPosition()
-        {
-            return _startPositions[_currentCount - 1];
-        }
-
-        public void RemoveUpperTorus()
-        {
-
-            if (_currentCount == _maxCount && CheckFillState())
-            {
-                OnFillStateChange?.Invoke(false);
-            }
-            Remove();
-        }
-
-        public bool CanSet()
-        {
-            if (_currentCount == _maxCount)
+            if (_torusStack.Count == _maxCount)
                 return false;
-
+            
+            if (_torusStack.TryPeek(out Torus torus))
+            {
+                if(torus.Color != addedTorus.Color)
+                    return false;
+            }
+            
+            _torusStack.Push(addedTorus);
+            print("push");
+            addedTorus.StopDrag(_startPositions[_torusStack.Count - 1]);
+            CheckComplete();
             return true;
         }
 
-        public void SetDragable(Torus draggable)
+        public void ReturnTorus(Torus torus)
         {
-            Add(draggable);
-            draggable.StopDrag(_startPositions[_currentCount - 1]);
+            _torusStack.Push(torus);
+            torus.StopDrag(_startPositions[_torusStack.Count - 1]);
+        }
 
-            if (_currentCount == _maxCount && CheckFillState())
+        public bool RemoveUpperTorus(out Torus returnedTorus)
+        {
+            if (!_completed && _torusStack.TryPop(out returnedTorus))
             {
-                OnFillStateChange?.Invoke(true);
+                returnedTorus.StartDrag(_upPos);
+                return true;
             }
-        }
-
-        private void Add(Torus tor)
-        {
-            _currentCount++;
-            _dragableObjects[_currentCount - 1] = tor;
-        }
-
-        private Torus GetUpper()
-        {
-            return _dragableObjects[_currentCount - 1];
+            
+            returnedTorus = null;
+            return false;
         }
         
-        private void Remove()
+        private void CheckComplete()
         {
-            _dragableObjects[_currentCount - 1] = null;
-            _currentCount--;
-        }
-        
-        private bool CheckFillState()
-        {
-            int parentColor = _dragableObjects[0].Color;
-            return _dragableObjects.All(torus => torus.Color == parentColor);
+            if (_torusStack.Count != _maxCount) return;
+            
+            int upperColor = _torusStack.Peek().Color; 
+            if (_torusStack.Any(torus => torus.Color != upperColor))
+            {
+                return;
+            }
+
+            _completed = true;
+            OnCompleted?.Invoke();
         }
     }
 }

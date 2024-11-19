@@ -1,105 +1,57 @@
-﻿using System.Collections;
-using CodeBase.Configs;
+﻿using CodeBase.Configs;
+using DG.Tweening;
 using UnityEngine;
 
 namespace CodeBase.Game.Gameplay
 {
     public class Torus : MonoBehaviour
     {
-        [field: SerializeField]public int Color { get; private set; }
+        [field: SerializeField] public int Color { get; private set; }
 
         [SerializeField] private float _animTime;
-        [SerializeField] private float _followSpeed;
+        [SerializeField] private float _zxSpeed;
         [SerializeField] private TorsColors _colorMap;
         
         private MeshRenderer _meshRenderer;
-        private Vector3 _startPosition;
+        private MeshFilter _meshFilter;
+        private Sequence _animation;
         private float _animProgress;
 
         private void Awake()
         {
-            _startPosition = transform.position;
             _meshRenderer = GetComponent<MeshRenderer>();
+            _meshFilter = GetComponent<MeshFilter>();
+            _animation = DOTween.Sequence();
         }
 
-        public void Initialize(int color)
+        public void Initialize(Mesh usedMesh)
         {
-            Color = color;
-            _meshRenderer.material.color = _colorMap.Colors[color];
+            _meshRenderer.material.color = _colorMap.GetColor(Color);
+            _meshFilter.mesh = usedMesh;
         }
 
-        public void StartDrag(Transform followingPoint)
+        public void StartDrag(float yPos)
         {
-            _startPosition = transform.position;
-            StopAllCoroutines();
-            StartCoroutine(StartDragAnim(followingPoint));
+            _animation.Kill();
+            _animation = DOTween.Sequence();
+            print("start animation");
+            Vector3 targetPos = transform.position;
+            targetPos.y = yPos;
+            
+            transform.DOMove(targetPos, _animTime);
         }
 
         public void StopDrag(Vector3 stopPosition)
         {
-            StopAllCoroutines();
-            StartCoroutine(StopDragAnim(stopPosition));
-        }
-
-        /*public void StopDrag()
-        {
-            StopAllCoroutines();
-            StartCoroutine(StopDragAnim(_startPosition));
-        }*/
-
-        private IEnumerator StartDragAnim(Transform followingPoint)
-        {
-            yield return null;
-            Vector3 targetPos = followingPoint.position;
-            targetPos.x = transform.position.x;
-            targetPos.z = transform.position.z;
+            _animation.Kill();
+            _animation = DOTween.Sequence();
+            print("stop animation");
             
-            float time = _animProgress * _animTime;
-            while (time < _animTime)
-            {
-                time += Time.deltaTime;
-                _animProgress = time / _animTime;
-                transform.position = Vector3.Lerp(_startPosition, targetPos, _animProgress);
-                yield return null;
-            }
-            _animProgress = 1;
-            transform.position = targetPos;
+            Vector3 tempPos = stopPosition;
+            tempPos.y = transform.position.y;
+            float time = Vector3.Distance(transform.position, tempPos) / _zxSpeed;
             
-            while (Vector3.Distance(transform.position, followingPoint.position) > 0.05f)
-            {
-                transform.position = Vector3.Lerp(transform.position, followingPoint.position, Time.deltaTime * _followSpeed);
-                yield return null;
-            }
-
-            while (true)
-            {
-                transform.position = followingPoint.position;
-                yield return null;
-            }
-        }
-
-        private IEnumerator StopDragAnim(Vector3 targetPos)
-        {
-            yield return null;
-            Vector3 startPos = transform.position;
-            Vector3 upPos = targetPos;
-            upPos.y = transform.position.y;
-            
-            float time = _animTime * _animProgress;
-            while (time > 0)
-            {
-                time -= Time.deltaTime;
-                _animProgress = time / _animTime;
-
-                if (_animProgress >= 0.5f) // 1-0.5
-                    transform.position = Vector3.Lerp(upPos, startPos, (_animProgress - 0.5f) * 2);
-                else
-                    transform.position = Vector3.Lerp(targetPos, upPos, _animProgress * 2);
-
-                yield return null;
-            }
-            _animProgress = 0;
-            transform.position = targetPos;
+            _animation.Append(transform.DOMove(tempPos, time)).Append(transform.DOMove(stopPosition, _animTime));
         }
     }
 }
