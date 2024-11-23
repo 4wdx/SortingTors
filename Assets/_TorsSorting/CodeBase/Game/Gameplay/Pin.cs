@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CodeBase.Configs;
 using UnityEngine;
 
 namespace CodeBase.Game.Gameplay
@@ -10,10 +11,12 @@ namespace CodeBase.Game.Gameplay
         public event Action OnCompleted;
         
         [SerializeField] private Torus[] _tors;
+        [SerializeField] private ParticleSystem _particleSystem;
+        [SerializeField] private bool _playInAll;
         
         private Stack<Torus> _torusStack;
         private int _maxCount;
-        private bool _completed;
+        private bool _isActive;
         
         private Vector3[] _startPositions;
         private float _upPos;
@@ -28,21 +31,28 @@ namespace CodeBase.Game.Gameplay
                 _startPositions[i] = _tors[i].transform.position;
         }
 
-        public void Initialize(Mesh torusMesh, float upPos)
+        public void StartGameplay(float upPos)
+        {
+            _isActive = true;
+            _upPos = upPos;
+        }
+        
+        public void SetSkin(SkinData skinData)
         {
             _torusStack.Clear();
-            _upPos = upPos;
-            
             for (int i = 0; i < _tors.Length; i++)
             {
+                _tors[i].transform.position = _startPositions[i];
                 if (_tors[i].Color > 0)
                 {
-                    _tors[i].transform.position = _startPositions[i];
-                    _tors[i].Initialize(torusMesh);
                     _torusStack.Push(_tors[i]);
+                    _tors[i].SetSkin(skinData);
+                    ;
                 }
-                else 
+                else
+                {
                     _tors[i].gameObject.SetActive(false);
+                }
             }
         }
 
@@ -58,7 +68,6 @@ namespace CodeBase.Game.Gameplay
             }
             
             _torusStack.Push(addedTorus);
-            print("push");
             addedTorus.StopDrag(_startPositions[_torusStack.Count - 1]);
             CheckComplete();
             return true;
@@ -72,7 +81,7 @@ namespace CodeBase.Game.Gameplay
 
         public bool RemoveUpperTorus(out Torus returnedTorus)
         {
-            if (!_completed && _torusStack.TryPop(out returnedTorus))
+            if (_torusStack.TryPop(out returnedTorus) && _isActive)
             {
                 returnedTorus.StartDrag(_upPos);
                 return true;
@@ -80,6 +89,18 @@ namespace CodeBase.Game.Gameplay
             
             returnedTorus = null;
             return false;
+        }
+
+        public void PlayParticle()
+        {
+            if (_playInAll)
+            {
+                _particleSystem.Play();
+                return;
+            }
+            
+            if (_isActive)
+                _particleSystem.Play();
         }
         
         private void CheckComplete()
@@ -92,7 +113,8 @@ namespace CodeBase.Game.Gameplay
                 return;
             }
 
-            _completed = true;
+            _isActive = false;
+            _particleSystem.Play();
             OnCompleted?.Invoke();
         }
     }

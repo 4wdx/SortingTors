@@ -1,78 +1,55 @@
-﻿using System.Collections;
-using CodeBase.Configs;
+﻿using CodeBase.Configs;
 using CodeBase.FSM;
 using CodeBase.Game.Gameplay;
 using CodeBase.Game.PlayerInput;
 using CodeBase.Game.UI;
-using CodeBase.Root.Services;
-using UnityEngine;
 
 namespace CodeBase.Root
 {
-    public sealed class GameplayState : GameState, IParametredState<int>
+    public sealed class GameplayState : GameState, IParametredState<PinsStack>
     {
-        private readonly PinsStack _pinsStack;
-        private readonly IGenerationService _generationService;
-        private readonly LevelsConfig _levelsConfig;
-        private readonly LevelText _levelText;
         private readonly DragHandler _dragHandler;
-        private readonly Mesh _mesh;
+        private readonly GameplayUI _gameplayUI;
+        private readonly SkinData _skinData;
+        private PinsStack _pinsStack;
 
         public GameplayState(StateMachine<GameState> stateMachine, 
-            PinsStack pinsStack,
-            IGenerationService generationService,
-            LevelsConfig levelsConfig,
-            LevelText levelText,
-            DragHandler dragHandler,
-            Mesh mesh) : base(stateMachine)
+            GameplayUI gameplayUI,
+            DragHandler dragHandler) : base(stateMachine)
         {
-            _pinsStack = pinsStack;
-            _generationService = generationService;
-            _levelsConfig = levelsConfig;
-            _levelText = levelText;
+            _gameplayUI = gameplayUI;
             _dragHandler = dragHandler;
-            _mesh = mesh;
         }
 
-        public void Enter(int loadingLevel)
+        public void Enter(PinsStack pinsStack)
         {
-            _levelText.SetLevel(loadingLevel);
+            _gameplayUI.gameObject.SetActive(true);
+            _gameplayUI.OnExit += GoToMenu;
+            
+            _pinsStack = pinsStack;
+            _pinsStack.StartGameplay();
+            _pinsStack.OnComplete += GoToResult;
+            
             _dragHandler.Enabled = true;
-            
-            /*int difficulty = _levelsConfig.GetDifficulty(loadingLevel); 
-            Debug.Log(difficulty);
-            PinData[] levelData = _generationService.Generate(difficulty);
-            
-            _pinsHandler.Initialize(levelData);*/
-
-            //_pinsStack.StartCoroutine(LoadLevel(loadingLevel));
-            _pinsStack.Initialize(_mesh);
-            _pinsStack.OnComplete += GoTo;
         }
         
         public override void Exit()
         {
-            _pinsStack.OnComplete -= GoTo;
+            _gameplayUI.gameObject.SetActive(false);
+            _gameplayUI.OnExit -= GoToMenu;
+            
+            _pinsStack.OnComplete -= GoToResult;
+            _pinsStack = null;
+            
             _dragHandler.Enabled = false;
         }
 
-        private void GoTo() => 
-            StateMachine.GoTo<LevelCompleteState>();
+        private void GoToResult() => 
+            StateMachine.GoTo<ResultState>();
 
-        private IEnumerator LoadLevel(int loadingLevel)
+        private void GoToMenu()
         {
-            int difficulty = _levelsConfig.GetDifficulty(loadingLevel); 
-            Debug.Log(difficulty);
-            PinData[] levelData = _generationService.Generate(difficulty);
-            
-            yield return null;
-            yield return null;
-            yield return null;
-            yield return null;
-            yield return null;
-            
-            //_pinsStack.Initialize(levelData);
-            
+            StateMachine.GoTo<MainMenuState, int>(-1);
         }
     }
 }

@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a6b0d8f7b3a04b3098170781e02d02f8, type: 3}
+  m_Name: SkinData 7
+  m_EditorClassIdentifier: 
+  <Rotation>k__BackingField: {x: 90, y: 0, z: 0}
+  <Mesh>k__BackingField: {fileID: -2299432351614934552, guid: 2feeedb801eb6084189fc05f35072a0c, type: 3}
+  <Materials>k__BackingField:
+  - {fileID: -3846018093981099296, guid: 2feeedb801eb6084189fc05f35072a0c, type: 3}
+  - {fileID: 4874126678125670354, guid: 2feeedb801eb6084189fc05f35072a0c, type: 3}

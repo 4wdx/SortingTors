@@ -1,4 +1,5 @@
 ﻿using System;
+using CodeBase.Configs;
 using UnityEngine;
 
 namespace CodeBase.Game.Gameplay
@@ -13,17 +14,26 @@ namespace CodeBase.Game.Gameplay
         [SerializeField] private Transform _plane;
         private int _completedCount;
         private int _addedPinCount;
-        private Mesh _torusMesh;
+        private SkinData _skinData;
 
-        public void Initialize(Mesh torusMesh)
+        public void StartGameplay()
         {
-            _torusMesh = torusMesh;
             _completedCount = 0;
+            foreach (Pin pin in _mainPins)
+            {
+                pin.StartGameplay(_plane.position.y);
+                pin.OnCompleted += CheckCompleted;
+            }
+        }
+        
+        public void SetView(SkinData skinData)
+        {
+            _skinData = skinData;
             
             foreach (Pin pin in _mainPins)
             {
-                pin.Initialize(torusMesh, _plane.position.y);
-                pin.OnCompleted += UpdateCompletedCounter;
+                pin.SetSkin(_skinData);
+                pin.OnCompleted += CheckCompleted;
             }
 
             foreach (Pin pin in _rewardedPins) 
@@ -36,22 +46,32 @@ namespace CodeBase.Game.Gameplay
                 return;
             
             _rewardedPins[_addedPinCount].gameObject.SetActive(true);
-            _rewardedPins[_addedPinCount].Initialize(_torusMesh, _plane.position.y);
-            _rewardedPins[_addedPinCount].OnCompleted += UpdateCompletedCounter;
+            _rewardedPins[_addedPinCount].SetSkin(_skinData);
+            _rewardedPins[_addedPinCount].OnCompleted += CheckCompleted;
             _addedPinCount++;
         }
 
-        private void UpdateCompletedCounter()
+        private void CheckCompleted()
         {
             _completedCount++;
             if (_completedCount == _colors)
-                OnComplete?.Invoke();
+                Complete();
         }
 
-        private void OnDestroy()
+        private void Complete()
         {
-            foreach (Pin pin in _mainPins)
-                pin.OnCompleted -= UpdateCompletedCounter;
+            
+            foreach (Pin pin in _mainPins) 
+                pin.PlayParticle();
+
+            foreach (Pin pin in _rewardedPins)
+            {
+                if (pin.gameObject.activeInHierarchy)
+                    pin.PlayParticle();
+            }
+            
+            _completedCount = 0;
+            OnComplete?.Invoke();
         }
     }
 }

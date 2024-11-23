@@ -24,17 +24,21 @@ namespace CodeBase.Game.Gameplay
             _animation = DOTween.Sequence();
         }
 
-        public void Initialize(Mesh usedMesh)
+        public void SetSkin(SkinData skinData)
         {
-            _meshRenderer.material.color = _colorMap.GetColor(Color);
-            _meshFilter.mesh = usedMesh;
+            _meshRenderer.materials = skinData.Materials;
+            _meshFilter.mesh = skinData.Mesh;
+
+            if (Color == 0) return;
+            
+            foreach (Material material in _meshRenderer.materials) 
+                material.color = _colorMap.GetColor(Color);
         }
 
         public void StartDrag(float yPos)
         {
             _animation.Kill();
             _animation = DOTween.Sequence();
-            print("start animation");
             Vector3 targetPos = transform.position;
             targetPos.y = yPos;
             
@@ -45,7 +49,6 @@ namespace CodeBase.Game.Gameplay
         {
             _animation.Kill();
             _animation = DOTween.Sequence();
-            print("stop animation");
             
             Vector3 tempPos = stopPosition;
             tempPos.y = transform.position.y;

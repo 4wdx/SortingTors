@@ -12,13 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: efe8b78dabc246b59f8968cc6bec417e, type: 3}
   m_Name: MainTorsColors
   m_EditorClassIdentifier: 
-  <Colors>k__BackingField:
+  _colors:
   - {r: 1, g: 0, b: 0, a: 1}
-  - {r: 1, g: 0.9220363, b: 0, a: 1}
-  - {r: 0.9866247, g: 0, b: 1, a: 1}
-  - {r: 0.1817751, g: 0, b: 1, a: 1}
-  - {r: 0, g: 0.7184715, b: 1, a: 1}
-  - {r: 0, g: 1, b: 0.5804844, a: 1}
-  - {r: 0.48595786, g: 1, b: 0, a: 1}
-  - {r: 0.058393303, g: 0.3584906, b: 0.015218933, a: 1}
-  - {r: 1, g: 1, b: 1, a: 1}
+  - {r: 0, g: 0, b: 1, a: 1}
+  - {r: 0, g: 1, b: 0, a: 1}
+  - {r: 1, g: 1, b: 0, a: 1}
+  - {r: 1, g: 0, b: 0.50181055, a: 1}
+  - {r: 0, g: 1, b: 0.8221004, a: 1}
+  - {r: 1, g: 0.47996545, b: 0, a: 1}

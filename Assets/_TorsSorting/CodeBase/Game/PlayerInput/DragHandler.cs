@@ -13,11 +13,10 @@ namespace CodeBase.Game.PlayerInput
         private Pin _cachedPin;
         
         private Vector3 _startPos;
-
-
+        
         public DragHandler(LayerMask pinsLayer, LayerMask planeLayer)
         {
-            _click = new Click<Pin>(pinsLayer, planeLayer, 0.25f);
+            _click = new Click<Pin>(pinsLayer, planeLayer, 0.175f);
         }
 
         public void Tick(float deltaTime)

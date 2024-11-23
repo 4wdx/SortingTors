@@ -1,5 +1,6 @@
 ﻿using System;
 using CodeBase.Utils;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace CodeBase.Game.PlayerInput
@@ -71,16 +72,42 @@ namespace CodeBase.Game.PlayerInput
         
         public T StopClick()
         {
+            /*if (Component != null)
+            {
+                T result = Raycast(_clickLayers, out RaycastHit hit, Component.transform.position) ? hit.collider.GetComponent<T>() : null;
+                Performed = false;
+                Dragging = false;
+                Component = null;
+                
+                return result;
+            }
+
+            else
+            {
+                Performed = false;
+                Dragging = false;
+                Component = null;
+                return Raycast(_clickLayers, out RaycastHit hit) ? hit.collider.GetComponent<T>() : null;
+            }*/
+            
+            
             Performed = false;
             Component = null;
             Dragging = false;
-
-            return Raycast(_clickLayers, out RaycastHit hit) ? hit.collider.GetComponent<T>() : null;
+            
+            
+            return Raycast(_clickLayers, out RaycastHit hit1) ? hit1.collider.GetComponent<T>() : null;
         } 
         
         private bool Raycast(LayerMask layerMask, out RaycastHit hit)
         {
             return Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out hit, Mathf.Infinity, layerMask);
+        }
+
+        private bool Raycast(LayerMask layerMask, out RaycastHit hit, Vector3 worldPosition)
+        {
+            return Physics.Raycast(Camera.main.ScreenPointToRay(Camera.main.WorldToScreenPoint(worldPosition)),
+                out hit, Mathf.Infinity, layerMask);
         }
     }
 }
