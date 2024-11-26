@@ -1,11 +1,12 @@
 ﻿using CodeBase.FSM;
 using CodeBase.Game.Gameplay;
 using CodeBase.Game.UI;
-using CodeBase.Root.Services.LevelFactory;
+using CodeBase.Root.Services;
+using YG;
 
 namespace CodeBase.Root
 {
-    public class MainMenuState : GameState, IParametredState<int>
+    public class MainMenuState : GameState, IParametredState<int>, IDefaultState
     {
         private readonly LevelFactory _levelFactory;
         private readonly MainMenuUI _mainMenuUI;
@@ -19,30 +20,31 @@ namespace CodeBase.Root
             _mainMenuUI = mainMenuUI;
         }
 
-        public void Enter(int loadingLevel = -1)
+        public void Enter(int loadingLevel)
         {
-            _mainMenuUI.gameObject.SetActive(true);
+            _levelFactory.DestroyCurrent();
+            _mainMenuUI.Show();
             _mainMenuUI.OnGameplayEnter += GoToGameplay;
             _mainMenuUI.OnShopEnter += GoToShop;
             
-            //todo: move out this: _levelText.SetLevel(loadingLevel);
-
-
-            if (loadingLevel != -1)
-            {
-                _pinsStack = _levelFactory.CreatePinsStack(loadingLevel);
-            }
-            else
-            {
-                _levelFactory.UpdateViewInCurrent();
-            }
+            _pinsStack = _levelFactory.CreatePinsStack(loadingLevel);
         }
-        
+
+        public void Enter()
+        {
+            _levelFactory.DestroyCurrent();
+            _mainMenuUI.Show();
+            _mainMenuUI.OnGameplayEnter += GoToGameplay;
+            _mainMenuUI.OnShopEnter += GoToShop;
+            
+            _pinsStack = _levelFactory.CreatePinsStack(YandexGame.savesData.CurrentLevel);
+        }
+
         public override void Exit()
         {
             _mainMenuUI.OnGameplayEnter -= GoToGameplay;
             _mainMenuUI.OnShopEnter -= GoToShop;
-            _mainMenuUI.gameObject.SetActive(false);
+            _mainMenuUI.Hide();
         }
 
         private void GoToGameplay() => 

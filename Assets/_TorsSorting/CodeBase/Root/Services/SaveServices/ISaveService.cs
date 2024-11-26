@@ -7,8 +7,10 @@ namespace CodeBase.Root.Services
         public void LevelComplete();
         public int GetCurrentLevel();
         
-        public void SaveCurrentSkin(int index);
-        public int GetCurrentSkin();
+        public void SaveCurrentSkin(int id);
+        public bool SkinAvailable(int id);
+        public int GetCurrentSkinId();
+        public int SkinCountInRarity(int rarity);
 
         public void SaveCurrentMoney(int value);
         public int GetCurrentMoney();

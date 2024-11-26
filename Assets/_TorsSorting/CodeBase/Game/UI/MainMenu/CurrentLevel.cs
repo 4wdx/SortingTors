@@ -14,18 +14,15 @@ namespace CodeBase.Game.UI.MainMenu
 
         public void Initialize(ISaveService saveService)
         {
-            _saveService = saveService;
-        }
-        
-        private void Awake()
-        {
             _textMeshPro = GetComponent<TextMeshProUGUI>();
             _baseText = _textMeshPro.text;
+            _saveService = saveService;
         }
 
         private void OnEnable()
         {
-            _textMeshPro.text = _baseText + _saveService.GetCurrentLevel();
+            if (_saveService != null)
+                _textMeshPro.text = _baseText + _saveService.GetCurrentLevel();
         }
     }
 }

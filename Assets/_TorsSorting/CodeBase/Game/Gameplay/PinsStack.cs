@@ -30,11 +30,8 @@ namespace CodeBase.Game.Gameplay
         {
             _skinData = skinData;
             
-            foreach (Pin pin in _mainPins)
-            {
+            foreach (Pin pin in _mainPins) 
                 pin.SetSkin(_skinData);
-                pin.OnCompleted += CheckCompleted;
-            }
 
             foreach (Pin pin in _rewardedPins) 
                 pin.gameObject.SetActive(false);
@@ -47,7 +44,9 @@ namespace CodeBase.Game.Gameplay
             
             _rewardedPins[_addedPinCount].gameObject.SetActive(true);
             _rewardedPins[_addedPinCount].SetSkin(_skinData);
+            _rewardedPins[_addedPinCount].StartGameplay(_plane.position.y);
             _rewardedPins[_addedPinCount].OnCompleted += CheckCompleted;
+            
             _addedPinCount++;
         }
 
@@ -60,7 +59,6 @@ namespace CodeBase.Game.Gameplay
 
         private void Complete()
         {
-            
             foreach (Pin pin in _mainPins) 
                 pin.PlayParticle();
 

@@ -18,15 +18,12 @@ namespace CodeBase.Game.UI.Result
         private bool _activated;
         private int _index;
 
-        private void OnEnable()
-        {
-            _button = GetComponent<Button>();
-            _button.onClick.AddListener(TryOpen);
-        }
-
         public void Initialize(int index)
         {
             _index = index;
+            _chest.color = Color.white;
+            _button = GetComponent<Button>();
+            _button.onClick.AddListener(TryOpen);
         }
 
         public void RewardPin()
@@ -47,8 +44,7 @@ namespace CodeBase.Game.UI.Result
 
         private void Animation()
         {
-            
-            _chest.DOColor(Color.clear, 0.25f);
+            _chest.DOColor(Color.clear, 0.4f);
         }
 
         private void TryOpen()

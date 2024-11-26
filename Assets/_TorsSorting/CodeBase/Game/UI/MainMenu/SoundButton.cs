@@ -18,6 +18,7 @@ namespace CodeBase.Game.UI.MainMenu
             _settingsService = settingsService;
             _button = GetComponent<Button>();
             _image = GetComponent<Image>();
+            _image.sprite = _settingsService.GetMusicState() ? _enabledSprite : _disabledSprite;
             _button.onClick.AddListener(SwitchSound);
         }
 

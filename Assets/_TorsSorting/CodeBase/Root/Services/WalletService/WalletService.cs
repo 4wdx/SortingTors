@@ -5,7 +5,7 @@ namespace CodeBase.Root.Services
     public class WalletService : IWalletService
     {
         public event Action<int> OnMoneyChange;
-        public event Action<int> OnPinAdd;
+        public event Action<int> OnPinChange;
 
         public int CurrentMoney
         {
@@ -19,11 +19,11 @@ namespace CodeBase.Root.Services
         
         public int CurrentPin
         {
-            get => _currentMoney;
+            get => _currentPin;
             private set
             {
                 _currentPin = value;
-                OnMoneyChange?.Invoke(value);
+                OnPinChange?.Invoke(value);
             } 
         }
 
@@ -35,6 +35,7 @@ namespace CodeBase.Root.Services
         {
             _saveService = saveService;
             CurrentMoney = _saveService.GetCurrentMoney();
+            CurrentPin = _saveService.GetCurrentPin();
         }
 
         public void AddMoney(int value)
@@ -46,27 +47,28 @@ namespace CodeBase.Root.Services
             _saveService.SaveCurrentMoney(CurrentMoney);
         }
 
-        public bool TryRemoveMoney(int value)
+        public void TryRemoveMoney(int value)
         {
             if (value <= 0)
                 throw new Exception("Value must be greater than 0");
 
-            if (CurrentMoney < value) return false;
+            if (CurrentMoney < value) 
+                throw new Exception("Cannot remove more money than current money");
             
             CurrentMoney -= value;
             _saveService.SaveCurrentMoney(CurrentMoney);
-            return true;
         }
 
         public void AddPin()
         {
             CurrentPin += 1;
-            
+            _saveService.SaveCurrentPin(CurrentPin);
         }
 
-        public bool TryRemovePin()
+        public void RemovePin()
         {
-            throw new NotImplementedException();
+            CurrentPin -= 1;
+            _saveService.SaveCurrentPin(CurrentPin);
         }
     }
 }

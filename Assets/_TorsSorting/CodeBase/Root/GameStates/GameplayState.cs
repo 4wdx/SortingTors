@@ -3,28 +3,33 @@ using CodeBase.FSM;
 using CodeBase.Game.Gameplay;
 using CodeBase.Game.PlayerInput;
 using CodeBase.Game.UI;
+using CodeBase.Root.Services;
 
 namespace CodeBase.Root
 {
     public sealed class GameplayState : GameState, IParametredState<PinsStack>
     {
         private readonly DragHandler _dragHandler;
+        private readonly ISaveService _saveService;
         private readonly GameplayUI _gameplayUI;
         private readonly SkinData _skinData;
         private PinsStack _pinsStack;
 
         public GameplayState(StateMachine<GameState> stateMachine, 
             GameplayUI gameplayUI,
-            DragHandler dragHandler) : base(stateMachine)
+            DragHandler dragHandler,
+            ISaveService saveService) : base(stateMachine)
         {
             _gameplayUI = gameplayUI;
             _dragHandler = dragHandler;
+            _saveService = saveService;
         }
 
         public void Enter(PinsStack pinsStack)
         {
-            _gameplayUI.gameObject.SetActive(true);
+            _gameplayUI.Show();
             _gameplayUI.OnExit += GoToMenu;
+            _gameplayUI.OnSkip += SkipLevel;
             
             _pinsStack = pinsStack;
             _pinsStack.StartGameplay();
@@ -35,8 +40,9 @@ namespace CodeBase.Root
         
         public override void Exit()
         {
-            _gameplayUI.gameObject.SetActive(false);
+            _gameplayUI.Hide();
             _gameplayUI.OnExit -= GoToMenu;
+            _gameplayUI.OnSkip -= SkipLevel;
             
             _pinsStack.OnComplete -= GoToResult;
             _pinsStack = null;
@@ -47,9 +53,13 @@ namespace CodeBase.Root
         private void GoToResult() => 
             StateMachine.GoTo<ResultState>();
 
-        private void GoToMenu()
+        private void GoToMenu() => 
+            StateMachine.GoTo<MainMenuState>();
+
+        private void SkipLevel()
         {
-            StateMachine.GoTo<MainMenuState, int>(-1);
+            _saveService.LevelComplete();
+            StateMachine.GoTo<MainMenuState>();
         }
     }
 }

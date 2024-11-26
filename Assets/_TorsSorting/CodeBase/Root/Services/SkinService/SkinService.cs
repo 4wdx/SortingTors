@@ -14,15 +14,19 @@ namespace CodeBase.Root.Services
         public SkinService(ISaveService saveService)
         {
             _saveService = saveService;
-            SetSkin(saveService.GetCurrentSkin());
+            SkinData currentSkin =  Resources.Load<SkinData>(BaseSkinPath + saveService.GetCurrentSkinId());
+            SetSkin(currentSkin);
         }
         
-        public void SetSkin(int id)
+        public void SetSkin(SkinData skinData)
         {
-            _saveService.SaveCurrentSkin(id);
-            SkinData skinData = Resources.Load<SkinData>(BaseSkinPath + id.ToString());
+            _saveService.SaveCurrentSkin(skinData.Id);
+            //SkinData skinData = Resources.Load<SkinData>(BaseSkinPath + id.ToString());
             
             CurrentSkin = skinData;
         }
+
+        public int GetCountInRarity(int rarity) => 
+            _saveService.SkinCountInRarity(rarity);
     }
 }

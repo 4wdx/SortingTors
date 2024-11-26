@@ -15,8 +15,8 @@ namespace CodeBase.Game.UI.Result
 
         public void AddReward(GiftButton giftButton)
         {
-            _walletService.AddMoney(_value);
             giftButton.RewardMoney(_value);
+            _walletService.AddMoney(_value);
         }
     }
 }

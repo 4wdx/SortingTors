@@ -4,7 +4,6 @@ using CodeBase.Game.Gameplay;
 using CodeBase.Game.PlayerInput;
 using CodeBase.Game.UI;
 using CodeBase.Root.Services;
-using CodeBase.Root.Services.LevelFactory;
 using CodeBase.Utils;
 using UnityEngine;
 
@@ -52,12 +51,12 @@ namespace CodeBase.Root
             
             _stateMachine = new StateMachine<GameState>();
             _stateMachine.AddState(new MainMenuState(_stateMachine, _mainMenuUI, _levelFactory));
-            _stateMachine.AddState(new GameplayState(_stateMachine, _gameplayUI, _dragHandler));
+            _stateMachine.AddState(new GameplayState(_stateMachine, _gameplayUI, _dragHandler, _saveService));
             _stateMachine.AddState(new ResultState(_stateMachine, _resultUI, _saveService));
             _stateMachine.AddState(new ShopState(_stateMachine, _shopUI, _levelFactory));
         
-            //_stateMachine.GoTo<MainMenuState, int>(_saveService.GetCurrentLevel());
-            _stateMachine.GoTo<ResultState>();
+            _stateMachine.GoTo<MainMenuState, int>(_saveService.GetCurrentLevel());
+            //_stateMachine.GoTo<ResultState>();
         }
 
         private void CreateServices()
@@ -81,12 +80,14 @@ namespace CodeBase.Root
             DontDestroyOnLoad(_updater.gameObject);
             
             _updater.Add(_dragHandler);
-            _skinService.SetSkin(1);
         }
 
         private void InitComponents()
         {
-            _resultUI.Initialize(_walletService);
+            _mainMenuUI.Initialize(_settingsService, _walletService, _saveService);
+            _gameplayUI.Initialize(_walletService, _levelFactory, _saveService);
+            _resultUI.Initialize(_walletService, _coroutineRunner);
+            _shopUI.Initialize(_walletService, _skinService, _levelFactory);
         }
     }
 }

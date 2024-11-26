@@ -6,18 +6,18 @@ namespace CodeBase.Root.Services
     {
         public void AddMoney(int value);
 
-        public bool TryRemoveMoney(int value);
+        public void TryRemoveMoney(int value);
 
         public void AddPin();
 
-        public bool TryRemovePin();
+        public void RemovePin();
     }
 
     public interface IReadWalletService
     {
         event Action<int> OnMoneyChange;
         
-        event Action<int> OnPinAdd;
+        event Action<int> OnPinChange;
         
         int CurrentMoney { get; }
         

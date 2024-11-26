@@ -2,7 +2,7 @@
 
 namespace CodeBase.Utils
 {
-    public sealed class CoroutineRunner : MonoBehaviour
+    public class CoroutineRunner : MonoBehaviour
     {
        
     }

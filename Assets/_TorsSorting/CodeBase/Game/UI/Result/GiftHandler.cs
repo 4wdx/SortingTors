@@ -1,46 +1,69 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using CodeBase.Root.Services;
 using DG.Tweening;
 using UnityEngine;
-using UnityEngine.UI;
-using YG;
 using Random = UnityEngine.Random;
 
 namespace CodeBase.Game.UI.Result
 {
     public class GiftHandler : MonoBehaviour
     {
-        [SerializeField] private GameObject _keysParent;
-        [SerializeField] private GameObject _addKeysParent;
-        [SerializeField] private GameObject _nextParent;
-        [Space]
+        public event Action OnKeysOver;
+
         [SerializeField] private GameObject[] _keysQueue;
+        [SerializeField] private GameObject _keysParent;
         [SerializeField] private GiftButton[] _buttons;
         
         private IWalletService _walletService;
         private IReward[] _rewards;
-        private bool _keysAdded;
+        private int _keys;
         
         public void Initialize(IWalletService walletService)
         {
             _walletService = walletService;
-            
         }
 
-        public void Show()
+        public void OnEnable()
         {
-            _addKeysParent.transform.localScale = Vector3.zero;
-            _nextParent.transform.localScale = Vector3.zero;
-            _keysParent.transform.localScale = Vector3.one;
-            _keys = 3;
-            
             for (int i = 0; i < _buttons.Length; i++)
             {
                 _buttons[i].Initialize(i);
                 _buttons[i].OnTryOpen += TryOpen;
             }
+        }
+
+        public void OnDisable()
+        {
+            foreach (GiftButton button in _buttons)
+            {
+                button.OnTryOpen -= TryOpen;
+            }
+        }
+
+        public void Start()
+        {
+            _keysParent.transform.DOScale(Vector3.one, 0.5f);
+            _keys = 3;
+            foreach (GameObject key in _keysQueue) 
+                key.SetActive(true);
             
             GenerateRewards();
+        }
+
+        public void Continue()
+        {
+            _keysParent.transform.DOScale(Vector3.one, 0.5f);
+            _keys = 3;
+            foreach (GameObject key in _keysQueue) 
+                key.SetActive(true);
+        }
+
+        public void Reset()
+        {
+            for (int i = 0; i < _buttons.Length; i++) 
+                _buttons[i].Initialize(i);
         }
 
         private void GenerateRewards()
@@ -65,12 +88,6 @@ namespace CodeBase.Game.UI.Result
             }
         }
 
-        public void Hide()
-        {
-            foreach (GiftButton button in _buttons)
-                button.OnTryOpen -= TryOpen;
-        }
-
         private void TryOpen(int rewardIndex)
         {
             if (_keys <= 0) return;
@@ -82,43 +99,18 @@ namespace CodeBase.Game.UI.Result
         private void RemoveKey()
         {
             _keys -= 1;
-            print(_keys);
-            for (int i = 0; i < _keysQueue.Length; i++)
-            {
-                if (i < _keys)
-                    _keysQueue[i].SetActive(true);
-                else
-                    _keysQueue[i].SetActive(false);
-            }
+            for (int i = 0; i < _keysQueue.Length; i++) 
+                _keysQueue[i].SetActive(i < _keys);
 
-            if (_keys == 0 && _keysAdded == false)
-            {
-                Sequence anim = DOTween.Sequence();
-                anim.Append(_keysParent.transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.OutBounce))
-                    .Append(_addKeysParent.transform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBounce));
-            }
-
-            if (_keys == 0 && _keysAdded == true)
-            {
-                Sequence anim = DOTween.Sequence();
-                anim.Append(_keysParent.transform.DOScale(Vector3.zero, 0.5f).SetEase(Ease.OutBounce))
-                    .Append(_nextParent.transform.DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBounce));
-            }
-        }
-        
-        private int _keys;
-
-        public void _RewardedShow()
-        {
-            YandexGame.RewVideoShow(99);
-            YandexGame.RewardVideoEvent += AddKeys;
+            if (_keys == 0) 
+                StartCoroutine(KeysOverRoutine());
         }
 
-        private void AddKeys(int obj)
+        private IEnumerator KeysOverRoutine()
         {
-            _keys = 3;
-            _addKeysParent.transform.localScale = Vector3.zero;
-            _keysParent.transform.localScale = Vector3.one;
+            _keysParent.transform.DOScale(Vector3.zero, 0.5f);
+            yield return new WaitForSeconds(0.75f);
+            OnKeysOver?.Invoke();
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using CodeBase.FSM;
 using CodeBase.Game.UI;
 using CodeBase.Root.Services;
-using CodeBase.Root.Services.LevelFactory;
 
 namespace CodeBase.Root
 {
@@ -20,19 +19,20 @@ namespace CodeBase.Root
 
         public void Enter()
         {
-            _shopUI.gameObject.SetActive(true);
+            _shopUI.Show();
+            _shopUI.OnExit += GoToMenu;
         }
 
         public override void Exit()
         {
-            _shopUI.OnExit -= GoInMenu;
-            _shopUI.gameObject.SetActive(false);
+            _shopUI.OnExit -= GoToMenu;
+            _shopUI.Hide();
             _levelFactory.UpdateViewInCurrent();
         }
 
-        private void GoInMenu()
+        private void GoToMenu()
         {
-            StateMachine.GoTo<MainMenuState, int>(-1);
+            StateMachine.GoTo<MainMenuState>();
         }
     }
 }

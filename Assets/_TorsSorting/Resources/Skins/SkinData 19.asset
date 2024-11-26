@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a6b0d8f7b3a04b3098170781e02d02f8, type: 3}
   m_Name: SkinData 19
   m_EditorClassIdentifier: 
-  <Rotation>k__BackingField: {x: 90, y: 0, z: 0}
-  <Mesh>k__BackingField: {fileID: 3058271799992181676, guid: 64687707c4913c44f812af8456219d20, type: 3}
+  <Id>k__BackingField: 19
+  <Icon>k__BackingField: {fileID: 21300000, guid: 8b2deb8f89ec434469bfc81f76d9eaff, type: 3}
+  <Mesh>k__BackingField: {fileID: 4858816384105015652, guid: 4a6f53c02870ee74a942793015330290, type: 3}
   <Materials>k__BackingField:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: -6922793697723135513, guid: 4a6f53c02870ee74a942793015330290, type: 3}
+  - {fileID: -6629797300637803691, guid: 4a6f53c02870ee74a942793015330290, type: 3}

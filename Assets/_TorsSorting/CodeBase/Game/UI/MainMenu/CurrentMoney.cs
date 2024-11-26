@@ -1,5 +1,4 @@
-﻿using System;
-using CodeBase.Root.Services;
+﻿using CodeBase.Root.Services;
 using TMPro;
 using UnityEngine;
 
@@ -7,12 +6,10 @@ namespace CodeBase.Game.UI.MainMenu
 {
     public class CurrentMoney : MonoBehaviour
     {
-        private TextMeshProUGUI _textMeshProUGUI;
-        private IWalletService _walletService;
+        [SerializeField] private TextMeshProUGUI _textMeshProUGUI;
 
         public void Initialize(IWalletService walletService)
         {
-            _walletService = walletService;
             _textMeshProUGUI = GetComponent<TextMeshProUGUI>();
             _textMeshProUGUI.text = walletService.CurrentMoney.ToString();
             walletService.OnMoneyChange += UpdateText;

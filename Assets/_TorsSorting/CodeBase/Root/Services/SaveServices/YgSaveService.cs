@@ -15,20 +15,39 @@ namespace CodeBase.Root.Services
         public int GetCurrentLevel() => 
             YandexGame.savesData.CurrentLevel;
 
-        public void SaveCurrentSkin(int index)
+        public void SaveCurrentSkin(int id)
         {
-            if (YandexGame.savesData.AvailableSkins[index] == false)
-                throw new Exception("Try to set closed skin");
+            if (YandexGame.savesData.AvailableSkins[id] == false)
+            {
+                if (id < 8)
+                    YandexGame.savesData.CommonSkins++;
+                else if (id < 16)
+                    YandexGame.savesData.RareSkins++;
+                else
+                    YandexGame.savesData.LegendSkins++;
+                
+                YandexGame.savesData.AvailableSkins[id] = true;
+            }
 
-            YandexGame.savesData.CurrentSkin = index;
+            YandexGame.savesData.CurrentSkin = id;
             YandexGame.SaveProgress();
         }
 
-        public bool CheckAvailableSkin(int index) => 
-            YandexGame.savesData.AvailableSkins[index];
+        public bool SkinAvailable(int id) => 
+            YandexGame.savesData.AvailableSkins[id];
 
-        public int GetCurrentSkin() => 
+        public int GetCurrentSkinId() => 
             YandexGame.savesData.CurrentSkin;
+
+        public int SkinCountInRarity(int rarity)
+        {
+            return rarity switch
+            {
+                0 => YandexGame.savesData.CommonSkins,
+                1 => YandexGame.savesData.RareSkins,
+                2 => YandexGame.savesData.LegendSkins
+            };
+        }
 
         public void SaveCurrentMoney(int value)
         {
@@ -46,7 +65,7 @@ namespace CodeBase.Root.Services
         }
 
         public int GetCurrentPin() => 
-            YandexGame.savesData.Money;
+            YandexGame.savesData.Pin;
 
         public void SaveSoundState(bool state)
         {
